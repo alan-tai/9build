@@ -78,27 +78,27 @@ function executeInstall(props, variant) {
     let command  = '';
     let variants = [];
 
-    if (props.apkUniversal) {
+    if (props.apkUniversal[0]) {
         addVariants(props, variants, 'universal');
     }
 
-    if (props.apkArmV7) {
+    if (props.apkArmV7[0]) {
         addVariants(props, variants, 'armeabi-v7a');
     }
 
-    if (props.apkArmV8) {
+    if (props.apkArmV8[0]) {
         addVariants(props, variants, 'arm64-v8a');
     }
 
-    if (props.apkArm) {
+    if (props.apkArm[0]) {
         addVariants(props, variants, 'armeabi');
     }
 
-    if (props.apkX86) {
+    if (props.apkX86[0]) {
         addVariants(props, variants, 'x86');
     }
 
-    if (props.apkX8664) {
+    if (props.apkX8664[0]) {
         addVariants(props, variants, 'x86_64');
     }
 
