@@ -12,13 +12,11 @@ export default class Settings {
      * @returns {Promise}
      */
     get(key, defaultValue) {
-        let self = this;
-
-        return new Promise(function(resolve, reject) {
-            self.contains(key)
+        return new Promise((resolve, reject) => {
+            this.contains(key)
                 .then(hasKey => {
                     if (hasKey) {
-                        self._storage.get(key, function(error, result) {
+                        this._storage.get(key, (error, result) => {
                             if (error) {
                                 reject(error);
                             } else {
@@ -30,9 +28,7 @@ export default class Settings {
                     } else {
                         resolve();
                     }
-                }).catch(error => {
-                reject(error);
-            });
+                }).catch(error => reject(error));
         });
     }
 
@@ -43,10 +39,8 @@ export default class Settings {
      * @returns {Promise}
      */
     set(key, data) {
-        let self = this;
-
-        return new Promise(function(resolve, reject) {
-            self._storage.set(key, data, function(error) {
+        return new Promise((resolve, reject) => {
+            this._storage.set(key, data, error => {
                 if (error) {
                     reject(error);
                 } else {
@@ -62,10 +56,8 @@ export default class Settings {
      * @returns {Promise}
      */
     remove(key) {
-        let self = this;
-
-        return new Promise(function(resolve, reject) {
-            self._storage.remove(key, function(error) {
+        return new Promise((resolve, reject) => {
+            this._storage.remove(key, error => {
                 if (error) {
                     reject(error);
                 } else {
@@ -80,10 +72,8 @@ export default class Settings {
      * @returns {Promise}
      */
     clear() {
-        let self = this;
-
-        return new Promise(function(resolve, reject) {
-            self._storage.clear(function(error) {
+        return new Promise((resolve, reject) => {
+            this._storage.clear(error => {
                 if (error) {
                     reject(error);
                 } else {
@@ -99,10 +89,8 @@ export default class Settings {
      * @returns {Promise}
      */
     contains(key) {
-        let self = this;
-
-        return new Promise(function(resolve, reject) {
-            self._storage.has(key, function(error, hasKey) {
+        return new Promise((resolve, reject) => {
+            this._storage.has(key, (error, hasKey) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -117,10 +105,8 @@ export default class Settings {
      * @returns {Promise}
      */
     keys() {
-        let self = this;
-
-        return new Promise(function(resolve, reject) {
-            self._storage.keys(function(error, keys) {
+        return new Promise((resolve, reject) => {
+            this._storage.keys((error, keys) => {
                 if (error) {
                     reject(error);
                 } else {

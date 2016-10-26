@@ -1,14 +1,16 @@
-const Path = require('path');
+'use strict';
 
-function prepareCommandForAppend(command) {
+import Path from 'path';
+
+const prepareCommandForAppend = command => {
     if (command.length > 0 && !command.endsWith(' && ')) {
         command += ' && ';
     }
 
     return command;
-}
+};
 
-function executeUploadArchives(props, enableBuild, enableClean, type) {
+const executeUploadArchives = (props, enableBuild, enableClean, type) => {
     let command = '';
 
     if (enableBuild) {
@@ -18,9 +20,9 @@ function executeUploadArchives(props, enableBuild, enableClean, type) {
     }
 
     return command;
-}
+};
 
-function executeAssemble(props) {
+const executeAssemble = props => {
     let command = '';
 
     if (props.buildClean[1]) {
@@ -56,9 +58,9 @@ function executeAssemble(props) {
     }
 
     return command;
-}
+};
 
-function executeInstall(props, variant) {
+const executeInstall = (props, variant) => {
     if (variant) {
         let command = 'adb';
 
@@ -82,9 +84,9 @@ function executeInstall(props, variant) {
     });
 
     return command;
-}
+};
 
-function addVariants(props, variants) {
+const addVariants = (props, variants) => {
     if (props.variantAppRelease[1]) {
         variants.push('app-release');
     }
@@ -96,9 +98,9 @@ function addVariants(props, variants) {
     if (props.variantProfDebug[1]) {
         variants.push('app-debug');
     }
-}
+};
 
-let generateCommandFor9Gag = function(props) {
+const generateCommandFor9Gag = props => {
     let command = '';
 
     command += executeUploadArchives(props, props.jarBuild[1], props.jarClean[1], 'jar');
@@ -118,4 +120,4 @@ let generateCommandFor9Gag = function(props) {
     return command;
 };
 
-module.exports = generateCommandFor9Gag;
+module.exports = { generateCommandFor9Gag };

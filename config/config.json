@@ -1,8 +1,8 @@
 {
     "windowWidth"     : 568,
-    "windowHeight"    : 426,
+    "windowHeight"    : 458,
     "windowMinWidth"  : 568,
-    "windowMinHeight" : 426,
+    "windowMinHeight" : 458,
     "margin"          : 8,
     "marginDouble"    : 16
 }
