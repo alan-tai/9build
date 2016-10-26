@@ -1,17 +1,16 @@
 'use strict';
 
-const { app, BrowserWindow, shell } = require('electron');
+import Config from './config/config.json';
+import Path from 'path'
+import is from 'electron-is';
 
-const Path        = require('path');
-const PackageInfo = require('./package.json');
-const Config      = require('./config/config.json');
-const is          = require('electron-is');
+const { app, BrowserWindow, shell } = require('electron');
 
 let win;
 
-function createWindow() {
+const createWindow = () => {
     win = new BrowserWindow({
-        title          : PackageInfo.description,
+        title          : app.getName(),
         width          : Config.windowWidth,
         height         : Config.windowHeight,
         minWidth       : Config.windowMinWidth,
@@ -20,37 +19,28 @@ function createWindow() {
         show           : false,
         webPreferences : {
             defaultEncoding : 'UTF-8',
-            scrollBounce    : true
+            webaudio        : false,
+            webgl           : false
         }
     });
 
-    win.once('ready-to-show', () => {
-        win.show();
-});
-
-    win.on('closed', () => {
-        win = null;
-});
-
+    win.once('ready-to-show', () => win.show());
+    win.on('closed', () => win = null);
     win.loadURL('file://' + Path.join(__dirname, 'app/index.html'));
 
     win.webContents.on('will-navigate', (e, url) => {
         e.preventDefault();
 
-    shell.openExternal(url);
-});
+        shell.openExternal(url);
+    });
 }
 
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-    if (!is.macOS()) {
-    app.quit();
-}
+    if (!is.macOS()) app.quit();
 });
 
 app.on('activate', () => {
-    if (win === null) {
-    createWindow();
-}
+    if (win === null) createWindow();
 });

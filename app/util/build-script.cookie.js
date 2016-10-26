@@ -1,14 +1,16 @@
-const Path = require('path');
+'use strict';
 
-function prepareCommandForAppend(command) {
+import Path from 'path';
+
+const prepareCommandForAppend = command => {
     if (command.length > 0 && !command.endsWith(' && ')) {
         command += ' && ';
     }
 
     return command;
-}
+};
 
-function executeUploadArchives(props, enableBuild, enableClean, type) {
+const executeUploadArchives = (props, enableBuild, enableClean, type) => {
     let command = '';
 
     if (enableBuild) {
@@ -18,9 +20,9 @@ function executeUploadArchives(props, enableBuild, enableClean, type) {
     }
 
     return command;
-}
+};
 
-function executeAssemble(props) {
+const executeAssemble = props => {
     let command = '';
 
     if (props.buildClean[0]) {
@@ -60,9 +62,9 @@ function executeAssemble(props) {
     }
 
     return command;
-}
+};
 
-function executeInstall(props, variant) {
+const executeInstall = (props, variant) => {
     if (variant) {
         let command = 'adb';
 
@@ -75,8 +77,9 @@ function executeInstall(props, variant) {
         return command;
     }
 
-    let command  = '';
-    let variants = [];
+    let command = '';
+
+    const variants = [];
 
     if (props.apkUniversal[0]) {
         addVariants(props, variants, 'universal');
@@ -108,9 +111,9 @@ function executeInstall(props, variant) {
     });
 
     return command;
-}
+};
 
-function addVariants(props, variants, abi) {
+const addVariants = (props, variants, abi) => {
     if (props.variantAppRelease[0]) {
         variants.push('app-' + abi + '-release');
     }
@@ -122,9 +125,9 @@ function addVariants(props, variants, abi) {
     if (props.variantProfDebug[0]) {
         variants.push('prof-' + abi + '-debug');
     }
-}
+};
 
-let generateCommandForCookie = function(props) {
+const generateCommandForCookie = props => {
     let command = '';
 
     command += executeUploadArchives(props, props.daoBuild[0], props.daoClean[0], 'dao');
@@ -146,4 +149,4 @@ let generateCommandForCookie = function(props) {
     return command;
 };
 
-module.exports = generateCommandForCookie;
+module.exports = { generateCommandForCookie };
