@@ -43,7 +43,6 @@
         "mobx-react"                                     : "^3.5.8",
         "pubsub-js"                                      : "^1.5.4",
         "react"                                          : "^15.3.2",
-        "react-bootstrap"                                : "^0.30.3",
         "react-dom"                                      : "^15.3.2",
         "react-tap-event-plugin"                         : "^1.0.0"
     },

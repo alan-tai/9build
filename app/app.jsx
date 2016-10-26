@@ -4,6 +4,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import RefreshIndicator from 'material-ui/RefreshIndicator';
 import Drawer from 'material-ui/Drawer';
 import { List, ListItem } from 'material-ui/List';
 import Avatar from 'material-ui/Avatar';
@@ -18,7 +19,7 @@ import { Card, CardHeader, CardText } from 'material-ui/Card';
 import Toggle from 'material-ui/Toggle';
 import TextField from 'material-ui/TextField';
 import FloatingActionButton from 'material-ui/FloatingActionButton';
-import { Grid, Row, Col } from 'react-bootstrap';
+import { GridList, GridTile } from 'material-ui/GridList';
 import AboutDialog from './components/dialogs/AboutDialog.jsx';
 import MessageDialog from './components/dialogs/MessageDialog.jsx';
 import AppStore from './AppStore';
@@ -58,6 +59,7 @@ const DarkMuiTheme = getMuiTheme({
 });
 
 const ToggleStyle      = { marginBottom : Config.marginDouble };
+const ToggleStyleLast  = { marginBottom : 0 };
 const ToggleLabelStyle = { fontWeight : 300 };
 
 const PROJECT_COOKIE = 0;
@@ -246,9 +248,7 @@ export default class App extends React.Component {
         };
 
         this._loadSettings = () => {
-            this.props.store.messageDialogStore.title   = '';
-            this.props.store.messageDialogStore.message = 'Loading…';
-            this.props.store.messageDialogStore.visible = true;
+            this.props.store.loadingIndicatorStatus = 'loading';
 
             Promise.all([
                 Settings.get('isDarkTheme'),
@@ -301,155 +301,11 @@ export default class App extends React.Component {
                 this.props.store.daoBuild          = results[22] ? results[22] : [ false, false ];
                 this.props.store.daoClean          = results[23] ? results[23] : [ false, false ];
 
-                this.props.store.messageDialogStore.visible = false;
+                this.props.store.loadingIndicatorStatus = 'hide';
             }).catch(error => {
-                this.props.store.messageDialogStore.title   = 'Error';
                 this.props.store.messageDialogStore.message = error.toString();
+                this.props.store.messageDialogStore.visible = true;
             });
-        }
-
-        this._createVariantToggles = () => {
-            const variants = [];
-
-            if (this.props.store.projectId === PROJECT_COOKIE) {
-                variants.push(
-                    <Toggle
-                        key="AppStaging"
-                        label="AppStaging"
-                        defaultToggled={this.props.store.variantAppStaging[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'variantAppStaging')} />
-                );
-
-                variants.push(
-                    <Toggle
-                        key="AppRelease"
-                        label="AppRelease"
-                        defaultToggled={this.props.store.variantAppRelease[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'variantAppRelease')} />
-                );
-
-                variants.push(
-                    <Toggle
-                        key="ProfDebug"
-                        label="ProfDebug"
-                        defaultToggled={this.props.store.variantProfDebug[this.props.store.projectId]}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'variantProfDebug')} />
-                );
-            } else if (this.props.store.projectId === PROJECT_9GAG) {
-                variants.push(
-                    <Toggle
-                        key="AppJokes"
-                        label="AppJokes"
-                        defaultToggled={this.props.store.variantAppStaging[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'variantAppStaging')} />
-                );
-
-                variants.push(
-                    <Toggle
-                        key="AppRelease"
-                        label="AppRelease"
-                        defaultToggled={this.props.store.variantAppRelease[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'variantAppRelease')} />
-                );
-
-                variants.push(
-                    <Toggle
-                        key="AppDebug"
-                        label="AppDebug"
-                        defaultToggled={this.props.store.variantProfDebug[this.props.store.projectId]}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'variantProfDebug')} />
-                );
-            }
-
-            return variants;
-        }
-
-        this._createApkToggles = () => {
-            const apks = [];
-
-            if (this.props.store.projectId === PROJECT_COOKIE) {
-                apks.push(
-                    <Toggle
-                        key="Universal"
-                        label="Universal"
-                        defaultToggled={this.props.store.apkUniversal[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'apkUniversal')} />
-                );
-
-                apks.push(
-                    <Toggle
-                        key="ArmV7"
-                        label="ARM v7"
-                        defaultToggled={this.props.store.apkArmV7[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'apkArmV7')} />
-                );
-
-                apks.push(
-                    <Toggle
-                        key="ArmV8"
-                        label="ARM v8"
-                        defaultToggled={this.props.store.apkArmV8[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'apkArmV8')} />
-                );
-
-                apks.push(
-                    <Toggle
-                        key="Arm"
-                        label="ARM"
-                        defaultToggled={this.props.store.apkArm[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'apkArm')} />
-
-                );
-
-                apks.push(
-                    <Toggle
-                        key="x86"
-                        label="x86"
-                        defaultToggled={this.props.store.apkX86[this.props.store.projectId]}
-                        style={ToggleStyle}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'apkX86')} />
-
-                );
-
-                apks.push(
-                    <Toggle
-                        key="x8664"
-                        label="x86_64"
-                        defaultToggled={this.props.store.apkX8664[this.props.store.projectId]}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'apkX8664')} />
-                );
-            } else if (this.props.store.projectId === PROJECT_9GAG) {
-                apks.push(
-                    <Toggle
-                        key="apk"
-                        label="Install APK to device"
-                        defaultToggled={this.props.store.apkUniversal[this.props.store.projectId]}
-                        labelStyle={ToggleLabelStyle}
-                        onToggle={this._handleChange.bind(this, 'apkUniversal')} />
-                );
-            }
-
-            return apks;
         }
     }
 
@@ -464,8 +320,72 @@ export default class App extends React.Component {
     }
 
     render() {
-        const variantToggles = this._createVariantToggles();
-        const apkToggles     = this._createApkToggles();
+        const renderVariantToggle = (key, label, defaultToggled, isLast) => {
+            return (
+                <Toggle
+                    key={key}
+                    label={label}
+                    defaultToggled={defaultToggled}
+                    style={isLast ? ToggleStyleLast : ToggleStyle}
+                    labelStyle={ToggleLabelStyle}
+                    onToggle={(target, prop) => this._handleChange(key, target, prop)} />
+            );
+        };
+
+        const createVariantToggles = () => {
+            const variants = [];
+
+            if (this.props.store.projectId === PROJECT_COOKIE) {
+                variants.push(renderVariantToggle('variantAppStaging', 'AppStaging', this.props.store.variantAppStaging[this.props.store.projectId]));
+                variants.push(renderVariantToggle('variantAppRelease', 'AppRelease', this.props.store.variantAppRelease[this.props.store.projectId]));
+                variants.push(renderVariantToggle('variantProfDebug',  'ProfDebug',  this.props.store.variantProfDebug[this.props.store.projectId], true));
+            } else if (this.props.store.projectId === PROJECT_9GAG) {
+                variants.push(renderVariantToggle('variantAppStaging', 'AppJokes',   this.props.store.variantAppStaging[this.props.store.projectId]));
+                variants.push(renderVariantToggle('variantAppRelease', 'AppRelease', this.props.store.variantAppRelease[this.props.store.projectId]));
+                variants.push(renderVariantToggle('variantProfDebug',  'AppDebug',  this.props.store.variantProfDebug[this.props.store.projectId], true));
+            }
+
+            return variants;
+        };
+
+        const renderApkToggle = (key, label, defaultToggled, isLast) => {
+            return (
+                <Toggle
+                    key={key}
+                    label={label}
+                    defaultToggled={defaultToggled}
+                    style={isLast ? ToggleStyleLast : ToggleStyle}
+                    labelStyle={ToggleLabelStyle}
+                    onToggle={(target, prop) => this._handleChange(key, target, prop)} />
+            );
+        };
+
+        const createApkToggles = () => {
+            const apks = [];
+
+            if (this.props.store.projectId === PROJECT_COOKIE) {
+                apks.push(renderApkToggle('apkUniversal', 'Universal', this.props.store.apkUniversal[this.props.store.projectId]));
+                apks.push(renderApkToggle('apkArmV7',     'ARM v7',    this.props.store.apkArmV7[this.props.store.projectId]));
+                apks.push(renderApkToggle('apkArmV8',     'ARM v8',    this.props.store.apkArmV8[this.props.store.projectId]));
+                apks.push(renderApkToggle('apkArm',       'ARM',       this.props.store.apkArm[this.props.store.projectId]));
+                apks.push(renderApkToggle('apkX86',       'x86',       this.props.store.apkX86[this.props.store.projectId]));
+                apks.push(renderApkToggle('apkX8664',     'x86_64',    this.props.store.apkX8664[this.props.store.projectId], true));
+            } else if (this.props.store.projectId === PROJECT_9GAG) {
+                apks.push(renderApkToggle('apkUniversal', 'Install APK to device', this.props.store.apkUniversal[this.props.store.projectId], true));
+            }
+
+            return apks;
+        };
+
+        const renderListItem = projectId => {
+            return (
+                <ListItem
+                    primaryText={PROJECT_NAMES[projectId]}
+                    leftAvatar={<Avatar src={PROJECT_ICONS[projectId]} />}
+                    style={{ backgroundColor : this.props.store.projectId === projectId ? this.props.store.isDarkTheme ? DarkTheme.backgroundColor : LightTheme.selectedColor : this.props.store.isDarkTheme ? DarkTheme.selectedColor : LightTheme.backgroundColor }}
+                    onTouchTap={() => this._handleDrawerClick(projectId)} />
+            );
+        };
 
         return (
             <MuiThemeProvider muiTheme={this.props.store.isDarkTheme ? DarkMuiTheme : LightMuiTheme}>
@@ -476,16 +396,8 @@ export default class App extends React.Component {
                         onRequestChange={open => this.props.store.isDrawerOpened = open }>
                         <List>
                             <Subheader>Projects</Subheader>
-                            <ListItem
-                                primaryText={PROJECT_NAMES[0]}
-                                leftAvatar={<Avatar src={PROJECT_ICONS[PROJECT_COOKIE]} />}
-                                style={{ backgroundColor : this.props.store.projectId === PROJECT_COOKIE ? this.props.store.isDarkTheme ? DarkTheme.backgroundColor : LightTheme.selectedColor : this.props.store.isDarkTheme ? DarkTheme.selectedColor : LightTheme.backgroundColor }}
-                                onTouchTap={() => this._handleDrawerClick(PROJECT_COOKIE)} />
-                            <ListItem
-                                primaryText={PROJECT_NAMES[1]}
-                                leftAvatar={<Avatar src={PROJECT_ICONS[PROJECT_9GAG]} />}
-                                style={{ backgroundColor : this.props.store.projectId === PROJECT_9GAG ? this.props.store.isDarkTheme ? DarkTheme.backgroundColor : LightTheme.selectedColor : this.props.store.isDarkTheme ? DarkTheme.selectedColor : LightTheme.backgroundColor }}
-                                onTouchTap={() => this._handleDrawerClick(PROJECT_9GAG)} />
+                            {renderListItem(PROJECT_9GAG)}
+                            {renderListItem(PROJECT_COOKIE)}
                         </List>
                     </Drawer>
                     <AppBar
@@ -504,193 +416,188 @@ export default class App extends React.Component {
                                     onTouchTap={() => this._handleAboutClick()} />
                             </IconMenu>
                         }
-                        zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
                         onLeftIconButtonTouchTap={() => this.props.store.isDrawerOpened = true } />
-                    <Grid fluid>
-                        <Row>
-                            {/* Project path */}
-                            <Col lg={12} md={12} sm={12} xs={12}>
-                                <TextField
-                                    fullWidth={true}
-                                    floatingLabelText="Project path"
-                                    value={this.props.store.projectPath[this.props.store.projectId]}
-                                    errorText={this.props.store.projectPath[this.props.store.projectId] && this.props.store.projectPath[this.props.store.projectId].length > 0 ? '' : 'Project path is required'}
-                                    style={{ marginBottom : Config.margin }}
-                                    onChange={() => this._handleChange('projectPath')} />
-                            </Col>
-                        </Row>
-                        <Row>
-                            {/* Variants */}
-                            <Col
-                                lg={6} md={6} sm={6} xs={6}
-                                style={{ paddingRight : Config.margin }}>
-                                <Card
-                                    zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
-                                    style={{ marginBottom : Config.margin }}>
-                                    <CardHeader title="Variants"/>
-                                    <CardText>
-                                        {variantToggles}
-                                    </CardText>
-                                </Card>
-                            </Col>
-                            {/* Build options */}
-                            <Col
-                                lg={6} md={6} sm={6} xs={6}
-                                style={{ paddingLeft : Config.margin }}>
-                                <Card
-                                    zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
-                                    style={{ marginBottom : Config.margin }}>
-                                    <CardHeader title="Build Options"/>
-                                    <CardText>
-                                        <Toggle
-                                            label="Clean build"
-                                            defaultToggled={this.props.store.buildClean[this.props.store.projectId]}
-                                            style={ToggleStyle}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('buildClean')} />
-                                        <Toggle
-                                            label="Fast build"
-                                            defaultToggled={this.props.store.buildFast[this.props.store.projectId]}
-                                            style={ToggleStyle}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('buildFast')} />
-                                        <Toggle
-                                            label="Detect memory leak"
-                                            defaultToggled={this.props.store.buildLeak[this.props.store.projectId]}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('buildLeak')} />
-                                    </CardText>
-                                </Card>
-                            </Col>
-                            {/* Installation */}
-                            <Col lg={12} md={12} sm={12} xs={12}>
-                                <Card
-                                    zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
-                                    style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
-                                    <CardHeader title="Installation"/>
-                                    <CardText>
-                                        {apkToggles}
-                                        <TextField
-                                            floatingLabelText="Device ID (Optional)"
-                                            fullWidth={true}
-                                            value={this.props.store.deviceId[this.props.store.projectId]}
-                                            onChange={() => this._handleChange('deviceId')} />
-                                    </CardText>
-                                </Card>
-                            </Col>
-                            {/* Unit test */}
-                            <Col
-                                lg={6} md={6} sm={6} xs={6}
-                                style={{ paddingRight : Config.margin }}>
-                                <Card
-                                    zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
-                                    style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
-                                    <CardHeader title="Test"/>
-                                    <CardText>
-                                        <Toggle
-                                            label="Unit test"
-                                            defaultToggled={this.props.store.testUnit[this.props.store.projectId]}
-                                            style={ToggleStyle}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('testUnit')} />
-                                        <Toggle
-                                            label="Coverage report"
-                                            defaultToggled={this.props.store.testCoverage[this.props.store.projectId]}
-                                            disabled={!this.props.store.testUnit[this.props.store.projectId] || this.props.store.projectId !== PROJECT_COOKIE}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('testCoverage')} />
-                                    </CardText>
-                                </Card>
-                            </Col>
-                            {/* Local Maven (AAR) */}
-                            <Col
-                                lg={6} md={6} sm={6} xs={6}
-                                style={{paddingLeft: Config.margin}}>
-                                <Card
-                                    zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
-                                    style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
-                                    <CardHeader title="Local Maven (AAR)"/>
-                                    <CardText>
-                                        <Toggle
-                                            label="Build"
-                                            defaultToggled={this.props.store.aarBuild[this.props.store.projectId]}
-                                            style={ToggleStyle}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('aarBuild')} />
-                                        <Toggle
-                                            label="Clean build"
-                                            defaultToggled={this.props.store.aarClean[this.props.store.projectId]}
-                                            disabled={!this.props.store.aarBuild[this.props.store.projectId]}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('aarClean')} />
-                                    </CardText>
-                                </Card>
-                            </Col>
-                            {/* Local Maven (JAR) */}
-                            <Col
-                                lg={6} md={6} sm={6} xs={6}
-                                style={{paddingRight: Config.margin}}>
-                                <Card
-                                    zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
-                                    style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
-                                    <CardHeader title="Local Maven (JAR)" />
-                                    <CardText>
-                                        <Toggle
-                                            label="Build"
-                                            defaultToggled={this.props.store.jarBuild[this.props.store.projectId]}
-                                            style={ToggleStyle}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('jarBuild')} />
-                                        <Toggle
-                                            label="Clean build"
-                                            defaultToggled={this.props.store.jarClean[this.props.store.projectId]}
-                                            disabled={!this.props.store.jarBuild[this.props.store.projectId]}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('jarClean')} />
-                                    </CardText>
-                                </Card>
-                            </Col>
-                            {/* DAO generation */}
-                            <Col
-                                lg={6} md={6} sm={6} xs={6}
-                                style={{ paddingLeft : Config.margin} }>
-                                <Card
-                                    zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
-                                    style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
-                                    <CardHeader title="DAO generation"/>
-                                    <CardText>
-                                        <Toggle
-                                            label="Build"
-                                            defaultToggled={this.props.store.daoBuild[this.props.store.projectId]}
-                                            disabled={this.props.store.projectId !== PROJECT_COOKIE}
-                                            style={ToggleStyle}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('daoBuild')} />
-                                        <Toggle
-                                            label="Clean build"
-                                            defaultToggled={this.props.store.daoClean[this.props.store.projectId]}
-                                            disabled={!this.props.store.daoBuild[this.props.store.projectId] || this.props.store.projectId !== PROJECT_COOKIE}
-                                            labelStyle={ToggleLabelStyle}
-                                            onToggle={() => this._handleChange('daoClean')} />
-                                    </CardText>
-                                </Card>
-                            </Col>
-                            {/* Dark theme */}
-                            <Col
-                                lg={6} md={6} sm={6} xs={6}
-                                style={{ paddingRight : Config.margin }}>
-                                <Toggle
-                                    label="Dark theme"
-                                    labelPosition="right"
-                                    defaultToggled={this.props.store.isDarkTheme}
-                                    style={{ marginTop : Config.margin, paddingBottom : Config.marginDouble }}
-                                    labelStyle={ToggleLabelStyle}
-                                    onToggle={() => this._handleChange('isDarkTheme')} />
-                            </Col>
-                        </Row>
-                    </Grid>
+                    <GridList
+                        cols={2}
+                        cellHeight={1}>
+                        {/* Project path */}
+                        <GridTile
+                            cols={2}
+                            rows={72}
+                            style={{ paddingLeft : Config.marginDouble, paddingRight : Config.marginDouble, paddingTop : 0, paddingBottom : 0 }}>
+                            <TextField
+                                fullWidth={true}
+                                floatingLabelText="Project path"
+                                value={this.props.store.projectPath[this.props.store.projectId]}
+                                errorText={this.props.store.projectPath[this.props.store.projectId] && this.props.store.projectPath[this.props.store.projectId].length > 0 ? '' : 'Project path is required'}
+                                style={{ marginBottom : Config.margin }}
+                                onChange={() => this._handleChange('projectPath')} />
+                        </GridTile>
+                        {/* Variants */}
+                        <GridTile
+                            cols={1}
+                            rows={228}
+                            style={{ paddingLeft : Config.marginDouble, paddingRight : Config.margin, paddingTop : Config.margin, marginBottom : Config.margin }}>
+                            <Card style={{ marginBottom : Config.margin }}>
+                                <CardHeader title="Variants" />
+                                <CardText>
+                                    {createVariantToggles()}
+                                </CardText>
+                            </Card>
+                        </GridTile>
+                        {/* Build options */}
+                        <GridTile
+                            cols={1}
+                            rows={228}
+                            style={{ paddingLeft : Config.margin, paddingRight : Config.marginDouble, paddingTop : Config.margin, marginBottom : Config.margin }}>
+                            <Card style={{ marginBottom : Config.margin }}>
+                                <CardHeader title="Build Options" />
+                                <CardText>
+                                    <Toggle
+                                        label="Clean build"
+                                        defaultToggled={this.props.store.buildClean[this.props.store.projectId]}
+                                        style={ToggleStyle}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('buildClean')} />
+                                    <Toggle
+                                        label="Fast build"
+                                        defaultToggled={this.props.store.buildFast[this.props.store.projectId]}
+                                        style={ToggleStyle}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('buildFast')} />
+                                    <Toggle
+                                        label="Detect memory leak"
+                                        defaultToggled={this.props.store.buildLeak[this.props.store.projectId]}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('buildLeak')} />
+                                </CardText>
+                            </Card>
+                        </GridTile>
+                        {/* Installation */}
+                        <GridTile
+                            cols={2}
+                            rows={this.props.store.projectId === PROJECT_9GAG ? 204 : 434}
+                            style={{ paddingLeft : Config.marginDouble, paddingRight : Config.marginDouble, paddingTop : 0, paddingBottom : 0 }}>
+                            <Card style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
+                                <CardHeader title="Installation" />
+                                <CardText>
+                                    {createApkToggles()}
+                                    <TextField
+                                        floatingLabelText="Device ID (Optional)"
+                                        fullWidth={true}
+                                        value={this.props.store.deviceId[this.props.store.projectId]}
+                                        onChange={() => this._handleChange('deviceId')} />
+                                </CardText>
+                            </Card>
+                        </GridTile>
+                        {/* Unit test */}
+                        <GridTile
+                            cols={1}
+                            rows={188}
+                            style={{ paddingLeft : Config.marginDouble, paddingRight : Config.margin, paddingTop : Config.margin, marginBottom : Config.margin }}>
+                            <Card style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
+                                <CardHeader title="Test" />
+                                <CardText>
+                                    <Toggle
+                                        label="Unit test"
+                                        defaultToggled={this.props.store.testUnit[this.props.store.projectId]}
+                                        style={ToggleStyle}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('testUnit')} />
+                                    <Toggle
+                                        label="Coverage report"
+                                        defaultToggled={this.props.store.testCoverage[this.props.store.projectId]}
+                                        disabled={!this.props.store.testUnit[this.props.store.projectId] || this.props.store.projectId !== PROJECT_COOKIE}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('testCoverage')} />
+                                </CardText>
+                            </Card>
+                        </GridTile>
+                        {/* Local Maven (AAR) */}
+                        <GridTile
+                            cols={1}
+                            rows={188}
+                            style={{ paddingLeft : Config.margin, paddingRight : Config.marginDouble, paddingTop : Config.margin, marginBottom : Config.margin }}>
+                            <Card style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
+                                <CardHeader title="Local Maven (AAR)" />
+                                <CardText>
+                                    <Toggle
+                                        label="Build"
+                                        defaultToggled={this.props.store.aarBuild[this.props.store.projectId]}
+                                        style={ToggleStyle}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('aarBuild')} />
+                                    <Toggle
+                                        label="Clean build"
+                                        defaultToggled={this.props.store.aarClean[this.props.store.projectId]}
+                                        disabled={!this.props.store.aarBuild[this.props.store.projectId]}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('aarClean')} />
+                                </CardText>
+                            </Card>
+                        </GridTile>
+                        {/* Local Maven (JAR) */}
+                        <GridTile
+                            cols={1}
+                            rows={188}
+                            style={{ paddingLeft : Config.marginDouble, paddingRight : Config.margin, paddingTop : Config.margin, marginBottom : Config.margin }}>
+                            <Card style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
+                                <CardHeader title="Local Maven (JAR)" />
+                                <CardText>
+                                    <Toggle
+                                        label="Build"
+                                        defaultToggled={this.props.store.jarBuild[this.props.store.projectId]}
+                                        style={ToggleStyle}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('jarBuild')} />
+                                    <Toggle
+                                        label="Clean build"
+                                        defaultToggled={this.props.store.jarClean[this.props.store.projectId]}
+                                        disabled={!this.props.store.jarBuild[this.props.store.projectId]}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('jarClean')} />
+                                </CardText>
+                            </Card>
+                        </GridTile>
+                        {/* DAO generation */}
+                        <GridTile
+                            cols={1}
+                            rows={188}
+                            style={{ paddingLeft : Config.margin, paddingRight : Config.marginDouble, paddingTop : Config.margin, marginBottom : Config.margin }}>
+                            <Card style={{ marginTop : Config.margin, marginBottom : Config.margin }}>
+                                <CardHeader title="DAO generation" />
+                                <CardText>
+                                    <Toggle
+                                        label="Build"
+                                        defaultToggled={this.props.store.daoBuild[this.props.store.projectId]}
+                                        disabled={this.props.store.projectId !== PROJECT_COOKIE}
+                                        style={ToggleStyle}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('daoBuild')} />
+                                    <Toggle
+                                        label="Clean build"
+                                        defaultToggled={this.props.store.daoClean[this.props.store.projectId]}
+                                        disabled={!this.props.store.daoBuild[this.props.store.projectId] || this.props.store.projectId !== PROJECT_COOKIE}
+                                        labelStyle={ToggleLabelStyle}
+                                        onToggle={() => this._handleChange('daoClean')} />
+                                </CardText>
+                            </Card>
+                        </GridTile>
+                        {/* Dark theme */}
+                        <GridTile
+                            cols={2}
+                            rows={48}
+                            style={{ paddingLeft : Config.marginDouble, paddingRight : Config.marginDouble, paddingTop : 0, paddingBottom : 0 }}>
+                            <Toggle
+                                label="Dark theme"
+                                labelPosition="right"
+                                defaultToggled={this.props.store.isDarkTheme}
+                                style={{ marginTop : Config.margin, paddingBottom : Config.marginDouble }}
+                                labelStyle={ToggleLabelStyle}
+                                onToggle={() => this._handleChange('isDarkTheme')} />
+                        </GridTile>
+                    </GridList>
                     <FloatingActionButton
-                        zDepth={this.props.store.isDarkTheme ? DarkTheme.zDepth : LightTheme.zDepth}
                         style={{ position : 'fixed', right : Config.marginDouble, bottom : Config.marginDouble }}
                         onTouchTap={() => this._handleBuildClick()}>
                         <FontIcon className="fa fa-android" />
@@ -701,6 +608,11 @@ export default class App extends React.Component {
                         logoWidth={158}
                         logoHeight={86} />
                     <MessageDialog store={this.props.store.messageDialogStore} />
+                    <RefreshIndicator
+                        size={72}
+                        left={248}
+                        top={193}
+                        status={this.props.store.loadingIndicatorStatus} />
                 </div>
             </MuiThemeProvider>
         );

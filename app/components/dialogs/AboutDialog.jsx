@@ -19,7 +19,6 @@ export default class AboutDialog extends React.Component {
         let logo = '';
 
         if (this.props.logoPath && this.props.logoPath.length > 0) {
-            console.trace('file://' + Path.join(__dirname, this.props.logoPath));
             logo = (
                 <img
                     src={'file://' + Path.join(__dirname, this.props.logoPath)}
