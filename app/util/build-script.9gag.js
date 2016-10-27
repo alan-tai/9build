@@ -76,7 +76,9 @@ const executeInstall = (props, variant) => {
     let command  = '';
     let variants = [];
 
-    addVariants(props, variants);
+    if (props.apkUniversal[1]) {
+        addVariants(props, variants);
+    }
 
     variants.forEach(variant => {
         command  = prepareCommandForAppend(command);
